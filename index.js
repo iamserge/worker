@@ -15,24 +15,28 @@ async function handleRequest(request) {
       headers: {
         "Content-Type": response.headers.get("Content-Type"),
         "Cache-Control": response.headers.get("Cache-Control"),
-        // Do NOT copy over Location headers to prevent redirect loops
       },
       status: response.status,
       statusText: response.statusText
     })
   } else {
-    // For non-root paths, send to Hostinger IP
+    // For non-root paths, we need to properly handle the request to Hostinger
+    
     // Create a new URL to the Hostinger IP with the same path
     const hostingerUrl = new URL(url.pathname, "http://195.35.51.234")
-    
-    // Copy over any query parameters
     hostingerUrl.search = url.search
     
-    // Fetch from Hostinger
+    // Create new headers object
+    const newHeaders = new Headers(request.headers)
+    
+    // Set the Host header to your original domain to prevent Error 1003
+    newHeaders.set('Host', 'myai.photos')
+    
+    // Fetch from Hostinger with modified headers
     const response = await fetch(hostingerUrl.toString(), {
       method: request.method,
-      headers: request.headers,
-      body: request.body
+      headers: newHeaders,
+      body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined
     })
     
     // Return the proxied response
