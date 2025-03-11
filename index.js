@@ -5,28 +5,24 @@ addEventListener('fetch', event => {
 async function handleRequest(request) {
   const url = new URL(request.url)
   
-  // Only proxy the root path
+  // Check if we're on the root path
   if (url.pathname === "/" || url.pathname === "") {
-    // Create a new request to the Framer site
-    const framerUrl = "https://smaller-spot-311511.framer.app" + url.pathname + url.search
+    // Fetch from Framer site
+    const response = await fetch("https://smaller-spot-311511.framer.app/")
     
-    // Fetch content from Framer
-    const response = await fetch(framerUrl, {
-      headers: request.headers,
-      method: request.method,
-      body: request.body,
-      redirect: 'follow'
+    // Return the proxied response
+    return new Response(response.body, {
+      headers: {
+        "Content-Type": response.headers.get("Content-Type"),
+        "Cache-Control": response.headers.get("Cache-Control"),
+        // Do NOT copy over Location headers to prevent redirect loops
+      },
+      status: response.status,
+      statusText: response.statusText
     })
-    
-    // Create a new response with the Framer content
-    const modifiedResponse = new Response(response.body, response)
-    
-    // Remove any headers that might reveal the original URL
-    modifiedResponse.headers.delete("X-Frame-Options")
-    
-    return modifiedResponse
+  } else {
+    // For non-root paths, send to your Hostinger hosting
+    // Using a direct fetch, not proxying through Framer
+    return fetch(request)
   }
-  
-  // For all other paths, fetch from original Hostinger hosting
-  return fetch(request)
 }
