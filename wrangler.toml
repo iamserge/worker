@@ -2,7 +2,11 @@ name = "myai-photos-proxy"
 main = "index.js"
 compatibility_date = "2024-03-11"
 
-[triggers]
+# Routes are now configured differently
 routes = [
   { pattern = "myai.photos/*", zone_name = "myai.photos" }
 ]
+
+# If you need cron triggers, use this format instead:
+# [triggers]
+# crons = ["*/5 * * * *"]
