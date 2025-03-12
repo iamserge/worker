@@ -9,7 +9,7 @@ addEventListener('fetch', event => {
 
 async function handleRootRequest(request) {
   // Fetch from Framer site
-  const response = await fetch("https://smaller-spot-311511.framer.app/", {
+  const response = await fetch("https://unlimited-screen-858392.framer.app/", {
     headers: request.headers,
     method: 'GET'
   })
